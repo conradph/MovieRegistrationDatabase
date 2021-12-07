@@ -1,0 +1,11 @@
+﻿
+
+@using (@Html.BeginForm("Search", "Movie", FormMethod.Post))
+{
+    @Html.RadioButton("option", "title") <label>Title</label>
+    @Html.RadioButton("option", "genre") <label>Genre</label>
+    @Html.TextBox("search") 
+    <input type = "submit"
+    name = "submit"
+    value = "Search" />
+    }
