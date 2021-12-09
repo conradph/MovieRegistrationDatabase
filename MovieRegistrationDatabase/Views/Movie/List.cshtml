@@ -3,6 +3,11 @@
 
 @foreach (var item in Model)
 {
+<div style="border: 3px solid black">
     <p>@item.Title</p>
+    <a asp-action="Details" asp-controller="Movie" asp-route-id="@item.ID"><p>Details</p></a>
+    <a asp-action="Edit" asp-controller="Movie" asp-route-id="@item.ID"><p>Edit</p></a>
+    <a asp-action="Delete" asp-controller="Movie" asp-route-id="@item.ID"><p>Delete</p></a>
+</div>
 }
 

@@ -1,0 +1,12 @@
+﻿@model Movie
+
+<h2>@Model.Title</h2>
+<br />
+<br />
+<p>Genre: @Model.Genre</p>
+<p>Year: @Model.Year</p>
+<p>Runtime: @Model.Runtime</p>
+
+<p>Are you sure you wish to delete this Movie?</p>
+<a asp-action="DeleteFromDb" asp-controller="Movie" asp-route-id="@Model.ID"><button>Yes</button></a>
+<a asp-action="List" asp-controller="Movie"><button>No</button></a>

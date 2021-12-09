@@ -11,6 +11,7 @@ namespace MovieRegistrationDatabase.Controllers
 {
     public class MovieController : Controller
     {
+        public MovieDAL MovieDB = new MovieDAL();
         public IActionResult Index()
         {
             return View();
@@ -20,32 +21,17 @@ namespace MovieRegistrationDatabase.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<Movie> movies = new List<Movie>();
-                using (var connect = new MySqlConnection(Secret.connection))
-                {
-                    string insertQuery = @"INSERT INTO movies VALUES (@ID, @Title, @Genre, @Year, @Runtime);";
-                    connect.Open();
-                    var result = connect.Execute(insertQuery, model);
-                    string selectQuery = "select * from movies";
-                    movies = connect.Query<Movie>(selectQuery).ToList();
-                    connect.Close();
-                }
+                MovieDB.CreateMovie(model);
                 return RedirectToAction("List");
             }
             return View(model);
         }
         public IActionResult List()
         {
-            List<Movie> movies = new List<Movie>();
-            using (var connect = new MySqlConnection(Secret.connection))
-            {
-                string selectQuery = "select * from movies";
-                movies = connect.Query<Movie>(selectQuery).ToList();
-                connect.Close();
-            }
+            List<Movie> movies = MovieDB.GetMovies();
             return View(movies);
         }
-        
+
         public IActionResult Search()
         {
             return View();
@@ -53,20 +39,62 @@ namespace MovieRegistrationDatabase.Controllers
         [HttpPost]
         public IActionResult Search(string option, string search)
         {
-            List<Movie> movies = new List<Movie>();
-            
-            string selectQuery = $"select * from movies where {option} = '{search}'";
-            return RedirectToAction("SearchResults", new { selectString = selectQuery });
+            return RedirectToAction("SearchResults", new { selectString = MovieDB.CreateSearchString(option, search) });
         }
         public IActionResult SearchResults(string selectString)
         {
-            List<Movie> movies = new List<Movie>();
-            using (var connect = new MySqlConnection(Secret.connection))
-            {
-                movies = connect.Query<Movie>(selectString).ToList();
-                connect.Close();
-            }
+            List<Movie> movies = MovieDB.SearchMovies(selectString);
             return View(movies);
+        }
+        public IActionResult Edit(int id)
+        {
+            Movie m = MovieDB.GetMovie(id);
+            if (m != null)
+            {
+                return View(m);
+            }
+            else
+            {
+                return RedirectToAction("IDError", id);
+            }
+        }
+        [HttpPost]
+        public IActionResult Edit(Movie m)
+        {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction("List");
+            }
+            return View(m);
+        }
+        public IActionResult Details(int id)
+        {
+            Movie m = MovieDB.GetMovie(id);
+            if (m != null)
+            {
+                return View(m);
+            }
+            else
+            {
+                return RedirectToAction("IDError", id);
+            }
+        }
+        public IActionResult Delete(int id)
+        {
+            Movie m = MovieDB.GetMovie(id);
+            if (m != null)
+            {
+                return View(m);
+            }
+            else
+            {
+                return RedirectToAction("IDError", id);
+            }
+        }
+        public IActionResult DeleteFromDB(int id)
+        {
+            MovieDB.DeleteMovie(id);
+            return RedirectToAction("List");
         }
     }
 }
